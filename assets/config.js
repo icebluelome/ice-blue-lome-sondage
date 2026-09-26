@@ -4,7 +4,7 @@
  * 2. Passez demoMode à false pour enregistrer dans Google Sheets.
  */
 window.ICE_BLUE_CONFIG = Object.freeze({
-  appsScriptUrl: "COLLEZ_ICI_L_URL_APPS_SCRIPT",
-  demoMode: true,
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbyZWHvFBOb_qbQt-M8rLDgiBZC5nuG9vRBs7ZTrWBqKScaGvQ_IDzemNs3NXXw127fx/exec",
+  demoMode: false,
   brandName: "Ice Blue Lomé",
 });
