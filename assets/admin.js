@@ -68,7 +68,13 @@
       submit.textContent = "Connexion…";
     }
     try {
-      const data = await fetchJsonp(config.appsScriptUrl, { action: "stats", key });
+      const data = await fetchJsonpWithRetry(
+        config.appsScriptUrl,
+        { action: "stats", key },
+        (attempt, attempts) => {
+          if (!silent && attempt > 1) submit.textContent = `Nouvel essai ${attempt}/${attempts}…`;
+        }
+      );
       if (!data?.ok) throw new Error(data?.error || "Accès refusé");
       activeKey = key;
       sessionStorage.setItem("iceblue_admin_key", key);
@@ -76,7 +82,9 @@
       document.querySelector("#mode-pill").textContent = "Données en direct";
       notice.hidden = true;
     } catch (error) {
-      loginError.textContent = error.message === "Accès refusé" ? "Code incorrect." : "Connexion impossible. Vérifiez le code et l’URL Apps Script.";
+      loginError.textContent = error.message === "Accès refusé"
+        ? "Code incorrect."
+        : "Google met trop de temps à répondre. Patientez quelques secondes, puis réessayez.";
       if (silent) {
         notice.hidden = false;
         notice.textContent = "Actualisation impossible. Les derniers résultats chargés restent affichés.";
@@ -87,11 +95,30 @@
     }
   }
 
+  async function fetchJsonpWithRetry(url, params, onAttempt) {
+    const attempts = 2;
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      onAttempt?.(attempt, attempts);
+      try {
+        return await fetchJsonp(url, { ...params, attempt });
+      } catch (error) {
+        lastError = error;
+        if (attempt < attempts) {
+          await new Promise((resolve) => window.setTimeout(resolve, 1200));
+        }
+      }
+    }
+
+    throw lastError || new Error("Connexion impossible");
+  }
+
   function fetchJsonp(url, params) {
     return new Promise((resolve, reject) => {
       const callbackName = `iceBlueCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
       const script = document.createElement("script");
-      const timeout = window.setTimeout(() => cleanup(new Error("Délai dépassé")), 15000);
+      const timeout = window.setTimeout(() => cleanup(new Error("Délai dépassé")), 22000);
       const query = new URLSearchParams({ ...params, callback: callbackName, _: Date.now().toString() });
 
       function cleanup(error, value) {
