@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#075ee8" />
+    <meta
+      name="description"
+      content="Participez au sondage Ice Blue Lomé et composez les glaces, mélanges, toppings et sauces que vous aimeriez découvrir."
+    />
+    <title>Votre glace idéale | Ice Blue Lomé</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo-ice-blue-lome.jpeg" />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+    <script src="assets/form.js" defer></script>
+  </head>
+  <body class="survey-page">
+    <a class="skip-link" href="#sondage">Aller au sondage</a>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Ice Blue Lomé, accueil">
+        <img class="brand-logo-img" src="assets/logo-ice-blue-lome.jpeg" alt="" />
+        <span class="brand-copy"><strong>ICE BLUE</strong><small>LOMÉ</small></span>
+      </a>
+      <a class="quiet-link" href="admin.html">Espace équipe</a>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Le sondage givré d’Ice Blue Lomé</p>
+          <h1 id="hero-title">Et si votre prochaine glace portait votre signature&nbsp;?</h1>
+          <p class="hero-lead">
+            Dites-nous les parfums, mélanges, toppings et sauces que vous aimeriez retrouver chez
+            Ice Blue Lomé. Vos envies guideront nos prochaines créations.
+          </p>
+          <div class="hero-meta" aria-label="Informations sur le sondage">
+            <span>Environ 2 minutes</span>
+            <span>Plusieurs choix possibles</span>
+            <span>Prénom facultatif</span>
+          </div>
+          <button class="button button-primary hero-cta" type="button" data-start>
+            Composer mes envies <span aria-hidden="true">→</span>
+          </button>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="hero-logo-frame">
+            <img src="assets/logo-ice-blue-lome.jpeg" alt="" />
+            <span>Votre avis compte</span>
+          </div>
+          <span class="sprinkle sprinkle-one"></span>
+          <span class="sprinkle sprinkle-two"></span>
+          <span class="sprinkle sprinkle-three"></span>
+        </div>
+      </section>
+
+      <section class="survey-shell" id="sondage" aria-labelledby="survey-title">
+        <div class="survey-intro">
+          <div>
+            <p class="eyebrow eyebrow-blue">Votre sélection</p>
+            <h2 id="survey-title">Composez le menu de vos rêves</h2>
+          </div>
+          <div class="step-status" aria-live="polite">
+            <span id="step-label">Étape 1 sur 5</span>
+            <div class="progress-track" aria-hidden="true"><span id="progress-bar"></span></div>
+          </div>
+        </div>
+
+        <div class="demo-banner" id="demo-banner" hidden>
+          <strong>Mode aperçu.</strong> Votre réponse reste uniquement sur cet appareil tant que le Google Sheet
+          n’est pas connecté.
+        </div>
+
+        <form id="survey-form" novalidate>
+          <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off" />
+
+          <section class="form-step is-active" data-step="1" aria-labelledby="step-1-title">
+            <div class="step-heading">
+              <span class="step-number">01</span>
+              <div>
+                <h3 id="step-1-title">Quels parfums vous font envie&nbsp;?</h3>
+                <p>Choisissez-en autant que vous le souhaitez.</p>
+              </div>
+            </div>
+            <fieldset class="choice-fieldset" data-required-group="flavors">
+              <legend class="sr-only">Parfums préférés</legend>
+              <div class="choice-grid">
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Vanille" /><span class="choice-emoji">🤍</span><span>Vanille</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Chocolat" /><span class="choice-emoji">🍫</span><span>Chocolat</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Fraise" /><span class="choice-emoji">🍓</span><span>Fraise</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Mangue" /><span class="choice-emoji">🥭</span><span>Mangue</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Fruit de la passion" /><span class="choice-emoji">☀️</span><span>Passion</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Coco" /><span class="choice-emoji">🥥</span><span>Coco</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Caramel" /><span class="choice-emoji">🍯</span><span>Caramel</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Café" /><span class="choice-emoji">☕</span><span>Café</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Pistache" /><span class="choice-emoji">🌿</span><span>Pistache</span></label>
+                <label class="choice-card"><input type="checkbox" name="flavors" value="Citron" /><span class="choice-emoji">🍋</span><span>Citron</span></label>
+              </div>
+            </fieldset>
+            <label class="other-field">
+              <span>Autre parfum / votre proposition</span>
+              <input type="text" name="otherFlavor" maxlength="120" placeholder="Ex. gingembre, bissap…" />
+            </label>
+            <p class="field-error" data-error="flavors" role="alert"></p>
+          </section>
+
+          <section class="form-step" data-step="2" aria-labelledby="step-2-title" hidden>
+            <div class="step-heading">
+              <span class="step-number">02</span>
+              <div>
+                <h3 id="step-2-title">Quels mélanges aimeriez-vous goûter&nbsp;?</h3>
+                <p>Sélectionnez les associations qui vous attirent.</p>
+              </div>
+            </div>
+            <fieldset class="choice-fieldset" data-required-group="mixes">
+              <legend class="sr-only">Mélanges de saveurs préférés</legend>
+              <div class="choice-grid choice-grid-wide">
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Vanille + chocolat" /><span>Vanille</span><b>+</b><span>Chocolat</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Fraise + vanille" /><span>Fraise</span><b>+</b><span>Vanille</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Mangue + passion" /><span>Mangue</span><b>+</b><span>Passion</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Coco + chocolat" /><span>Coco</span><b>+</b><span>Chocolat</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Caramel + café" /><span>Caramel</span><b>+</b><span>Café</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Pistache + chocolat" /><span>Pistache</span><b>+</b><span>Chocolat</span></label>
+                <label class="choice-card choice-card-text"><input type="checkbox" name="mixes" value="Je préfère un seul parfum" /><span>Je préfère</span><b>1</b><span>seul parfum</span></label>
+              </div>
+            </fieldset>
+            <label class="other-field featured-other">
+              <span>Autre mélange / votre proposition</span>
+              <input type="text" name="otherMix" maxlength="160" placeholder="Ex. coco + passion" />
+            </label>
+            <p class="field-error" data-error="mixes" role="alert"></p>
+          </section>
+
+          <section class="form-step" data-step="3" aria-labelledby="step-3-title" hidden>
+            <div class="step-heading">
+              <span class="step-number">03</span>
+              <div>
+                <h3 id="step-3-title">Ajoutons du croquant</h3>
+                <p>Quels toppings aimeriez-vous ajouter à votre glace&nbsp;?</p>
+              </div>
+            </div>
+            <fieldset class="choice-fieldset" data-required-group="toppings">
+              <legend class="sr-only">Toppings préférés</legend>
+              <div class="choice-grid">
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Brisures de biscuits chocolatés" /><span class="choice-emoji">🍪</span><span>Biscuits chocolatés</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Brisures de spéculoos" /><span class="choice-emoji">✨</span><span>Spéculoos</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Éclats de chocolat" /><span class="choice-emoji">🍫</span><span>Éclats de chocolat</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Fruits frais" /><span class="choice-emoji">🍓</span><span>Fruits frais</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Noisettes" /><span class="choice-emoji">🌰</span><span>Noisettes</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Cacahuètes" /><span class="choice-emoji">🥜</span><span>Cacahuètes</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Copeaux de coco" /><span class="choice-emoji">🥥</span><span>Copeaux de coco</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Mini-guimauves" /><span class="choice-emoji">☁️</span><span>Mini-guimauves</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Vermicelles colorés" /><span class="choice-emoji">🎉</span><span>Vermicelles</span></label>
+                <label class="choice-card"><input type="checkbox" name="toppings" value="Sans topping" /><span class="choice-emoji">○</span><span>Sans topping</span></label>
+              </div>
+            </fieldset>
+            <label class="other-field featured-other">
+              <span>Autre topping / votre proposition</span>
+              <input type="text" name="otherTopping" maxlength="160" placeholder="Écrivez votre idée ici" />
+            </label>
+            <p class="field-error" data-error="toppings" role="alert"></p>
+          </section>
+
+          <section class="form-step" data-step="4" aria-labelledby="step-4-title" hidden>
+            <div class="step-heading">
+              <span class="step-number">04</span>
+              <div>
+                <h3 id="step-4-title">La touche finale&nbsp;: la sauce</h3>
+                <p>Lesquelles vous feraient fondre&nbsp;?</p>
+              </div>
+            </div>
+            <fieldset class="choice-fieldset" data-required-group="sauces">
+              <legend class="sr-only">Sauces préférées</legend>
+              <div class="choice-grid">
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Chocolat" /><span class="choice-emoji">🍫</span><span>Chocolat</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Caramel" /><span class="choice-emoji">🍯</span><span>Caramel</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Fruits rouges" /><span class="choice-emoji">🍓</span><span>Fruits rouges</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Mangue" /><span class="choice-emoji">🥭</span><span>Mangue</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Passion" /><span class="choice-emoji">☀️</span><span>Passion</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Chocolat blanc" /><span class="choice-emoji">🤍</span><span>Chocolat blanc</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Noisette-cacao" /><span class="choice-emoji">🌰</span><span>Noisette-cacao</span></label>
+                <label class="choice-card"><input type="checkbox" name="sauces" value="Sans sauce" /><span class="choice-emoji">○</span><span>Sans sauce</span></label>
+              </div>
+            </fieldset>
+            <label class="other-field featured-other">
+              <span>Autre sauce / votre proposition</span>
+              <input type="text" name="otherSauce" maxlength="160" placeholder="Écrivez votre idée ici" />
+            </label>
+            <p class="field-error" data-error="sauces" role="alert"></p>
+          </section>
+
+          <section class="form-step" data-step="5" aria-labelledby="step-5-title" hidden>
+            <div class="step-heading">
+              <span class="step-number">05</span>
+              <div>
+                <h3 id="step-5-title">Un dernier mot avant de déguster</h3>
+                <p>Ces informations nous aident à mieux comprendre les réponses.</p>
+              </div>
+            </div>
+            <div class="profile-grid">
+              <label class="text-field">
+                <span>Votre prénom <small>Facultatif</small></span>
+                <input type="text" name="firstName" maxlength="80" autocomplete="given-name" placeholder="Votre prénom" />
+              </label>
+              <label class="text-field">
+                <span>Votre tranche d’âge <small>Facultatif</small></span>
+                <select name="ageRange">
+                  <option value="">Sélectionner</option>
+                  <option>Moins de 18 ans</option>
+                  <option>18–24 ans</option>
+                  <option>25–34 ans</option>
+                  <option>35–44 ans</option>
+                  <option>45 ans et plus</option>
+                </select>
+              </label>
+              <label class="text-field profile-full">
+                <span>À quelle fréquence prenez-vous une glace&nbsp;? <small>Facultatif</small></span>
+                <select name="frequency">
+                  <option value="">Sélectionner</option>
+                  <option>Plusieurs fois par semaine</option>
+                  <option>Environ une fois par semaine</option>
+                  <option>Quelques fois par mois</option>
+                  <option>Occasionnellement</option>
+                </select>
+              </label>
+              <label class="text-field profile-full">
+                <span>Une nouveauté ou une idée à nous souffler&nbsp;? <small>Facultatif</small></span>
+                <textarea name="suggestion" maxlength="500" rows="4" placeholder="Une présentation, une association ou une envie particulière…"></textarea>
+              </label>
+            </div>
+            <label class="consent-field">
+              <input type="checkbox" name="consent" required />
+              <span>J’accepte que mes réponses soient utilisées par Ice Blue Lomé pour analyser les préférences de sa clientèle.</span>
+            </label>
+            <p class="field-error" data-error="consent" role="alert"></p>
+          </section>
+
+          <div class="form-actions">
+            <button class="button button-secondary" type="button" data-prev hidden>← Retour</button>
+            <button class="button button-primary" type="button" data-next>Continuer →</button>
+            <button class="button button-primary" type="submit" data-submit hidden>
+              <span class="submit-label">Envoyer mes choix</span>
+              <span class="submit-loading" hidden>Envoi en cours…</span>
+            </button>
+          </div>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <section class="success-card" id="success-card" hidden tabindex="-1">
+          <div class="success-icon" aria-hidden="true">✓</div>
+          <p class="eyebrow eyebrow-blue">Merci pour votre participation</p>
+          <h3>Votre composition est entre de bonnes mains.</h3>
+          <p>Votre réponse aidera Ice Blue Lomé à imaginer des créations qui vous ressemblent.</p>
+          <button class="button button-secondary" type="button" data-restart>Envoyer une autre réponse</button>
+        </section>
+      </section>
+
+      <section class="promise-strip" aria-label="Notre démarche">
+        <p>Vous imaginez.</p><span aria-hidden="true">•</span><p>Nous écoutons.</p><span aria-hidden="true">•</span><p>Ice Blue crée.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="brand brand-footer"><img class="brand-logo-img footer-logo" src="assets/logo-ice-blue-lome.jpeg" alt="Logo Ice Blue Lomé" /><span class="brand-copy"><strong>ICE BLUE</strong><small>LOMÉ</small></span></div>
+      <p>Le goût de vos envies, à Lomé.</p>
+      <p class="footer-note">Aucun tarif n’est collecté ou présenté dans ce sondage.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#075ee8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Tableau de bord privé du sondage Ice Blue Lomé." />
+    <title>Tableau de bord | Ice Blue Lomé</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo-ice-blue-lome.jpeg" />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+    <script src="assets/admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <a class="skip-link" href="#dashboard">Aller au tableau de bord</a>
+    <header class="site-header admin-header">
+      <a class="brand" href="index.html" aria-label="Ice Blue Lomé, formulaire">
+        <img class="brand-logo-img" src="assets/logo-ice-blue-lome.jpeg" alt="" />
+        <span class="brand-copy"><strong>ICE BLUE</strong><small>LOMÉ</small></span>
+      </a>
+      <div class="admin-title"><span class="status-dot"></span>Espace équipe</div>
+      <a class="quiet-link" href="index.html">Voir le sondage</a>
+    </header>
+
+    <main class="admin-main" id="dashboard">
+      <section class="login-card" id="login-card" aria-labelledby="login-title">
+        <img class="login-logo" src="assets/logo-ice-blue-lome.jpeg" alt="Logo Ice Blue Lomé" />
+        <p class="eyebrow eyebrow-blue">Accès réservé</p>
+        <h1 id="login-title">Les envies de vos clients, en un coup d’œil.</h1>
+        <p>Saisissez le code administrateur généré lors de la connexion du Google Sheet.</p>
+        <form id="login-form">
+          <label class="text-field">
+            <span>Code administrateur</span>
+            <input type="password" name="adminKey" autocomplete="current-password" required placeholder="Votre code privé" />
+          </label>
+          <button class="button button-primary button-full" type="submit">Ouvrir le tableau de bord</button>
+          <p class="field-error login-error" id="login-error" role="alert"></p>
+        </form>
+        <div class="demo-login" id="demo-login" hidden>
+          <span>ou</span>
+          <button class="button button-secondary button-full" type="button" id="demo-button">Voir les données de démonstration</button>
+        </div>
+        <p class="login-footnote">Le code n’est jamais intégré au site public. Il reste dans cet onglet pendant votre session.</p>
+      </section>
+
+      <div class="dashboard-content" id="dashboard-content" hidden>
+        <section class="dashboard-topline">
+          <div>
+            <p class="eyebrow eyebrow-blue">Tableau de bord du sondage</p>
+            <h1>Ce que Lomé aimerait déguster</h1>
+            <p id="dashboard-period">Mise à jour des résultats…</p>
+          </div>
+          <div class="dashboard-actions">
+            <span class="mode-pill" id="mode-pill">Données en direct</span>
+            <button class="icon-button" type="button" id="refresh-button" aria-label="Actualiser les résultats">↻ <span>Actualiser</span></button>
+            <button class="icon-button" type="button" id="logout-button">Quitter</button>
+          </div>
+        </section>
+
+        <div class="admin-notice" id="admin-notice" hidden></div>
+
+        <section class="metric-grid" aria-label="Chiffres clés">
+          <article class="metric-card metric-primary">
+            <span>Réponses reçues</span>
+            <strong id="total-responses">0</strong>
+            <small>participations au total</small>
+          </article>
+          <article class="metric-card">
+            <span>Parfum n°1</span>
+            <strong id="top-flavor">—</strong>
+            <small id="top-flavor-share">Aucune donnée</small>
+          </article>
+          <article class="metric-card">
+            <span>Mélange n°1</span>
+            <strong id="top-mix">—</strong>
+            <small id="top-mix-share">Aucune donnée</small>
+          </article>
+          <article class="metric-card">
+            <span>Dernière réponse</span>
+            <strong id="last-response">—</strong>
+            <small id="last-response-time">En attente</small>
+          </article>
+        </section>
+
+        <section class="insights-card" aria-labelledby="insights-title">
+          <div class="section-kicker">À retenir</div>
+          <div>
+            <h2 id="insights-title">La synthèse Ice Blue</h2>
+            <div class="insight-list" id="insight-list"></div>
+          </div>
+        </section>
+
+        <section class="charts-grid" aria-label="Classements des préférences">
+          <article class="chart-card">
+            <div class="chart-heading"><div><span>01</span><h2>Parfums</h2></div><small>% des répondants</small></div>
+            <div class="bar-chart" id="chart-flavors"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-heading"><div><span>02</span><h2>Mélanges</h2></div><small>% des répondants</small></div>
+            <div class="bar-chart" id="chart-mixes"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-heading"><div><span>03</span><h2>Toppings</h2></div><small>% des répondants</small></div>
+            <div class="bar-chart" id="chart-toppings"></div>
+          </article>
+          <article class="chart-card">
+            <div class="chart-heading"><div><span>04</span><h2>Sauces</h2></div><small>% des répondants</small></div>
+            <div class="bar-chart" id="chart-sauces"></div>
+          </article>
+        </section>
+
+        <section class="suggestions-card" aria-labelledby="suggestions-title">
+          <div>
+            <p class="eyebrow eyebrow-blue">Expressions libres</p>
+            <h2 id="suggestions-title">Les idées soufflées par les clients</h2>
+          </div>
+          <div class="suggestion-cloud" id="suggestion-cloud"></div>
+        </section>
+
+        <p class="method-note">
+          Un répondant peut sélectionner plusieurs options&nbsp;: les pourcentages d’une catégorie ne totalisent donc pas nécessairement 100&nbsp;%.
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer admin-footer">
+      <p>Ice Blue Lomé · Données du sondage clients</p>
+    </footer>
+  </body>
+</html>
