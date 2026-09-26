@@ -5,6 +5,9 @@
  */
 window.ICE_BLUE_CONFIG = Object.freeze({
   appsScriptUrl: "https://script.google.com/macros/s/AKfycbw1kuBps0MW6kvmRMCFiUbISjGfRzmJDT80HaSRqIMMgZIIc8XELCKUn-23kQzz6gXo/exec",
+  publicStatsSheetId: "1rUC7mGjuRAkoXV93Fn8RPboEVqbQbfs4h1beGFXhs3Q",
+  publicStatsSheetName: "Statistiques",
+  adminKeyHash: "eee817dccd9523538c19aea752f2cb32569b788a82f6fb3f535983a806511d25",
   demoMode: false,
   brandName: "Ice Blue Lomé",
 });
