@@ -8,13 +8,14 @@
   const dashboard = document.querySelector("#dashboard-content");
   const demoLogin = document.querySelector("#demo-login");
   const notice = document.querySelector("#admin-notice");
-  let activeKey = "";
+  let authorizedSession = sessionStorage.getItem("iceblue_admin_ok") === "1";
   let demoActive = false;
 
   const isConfigured =
-    typeof config.appsScriptUrl === "string" &&
-    /^https:\/\/script\.google\.com\//.test(config.appsScriptUrl) &&
-    !config.appsScriptUrl.includes("COLLEZ_ICI");
+    typeof config.publicStatsSheetId === "string" &&
+    /^[A-Za-z0-9_-]{20,}$/.test(config.publicStatsSheetId) &&
+    typeof config.adminKeyHash === "string" &&
+    /^[a-f0-9]{64}$/.test(config.adminKeyHash);
   const demoAvailable = config.demoMode !== false || !isConfigured;
   demoLogin.hidden = !demoAvailable;
 
@@ -25,10 +26,16 @@
     loginError.textContent = "";
     const key = new FormData(loginForm).get("adminKey").trim();
     if (!isConfigured) {
-      loginError.textContent = "Connectez d’abord l’URL Apps Script dans assets/config.js, ou utilisez la démonstration.";
+      loginError.textContent = "La source des statistiques n’est pas encore configurée.";
       return;
     }
-    await openLiveDashboard(key);
+    if (!(await verifyAdminKey(key))) {
+      loginError.textContent = "Code incorrect.";
+      return;
+    }
+    authorizedSession = true;
+    sessionStorage.setItem("iceblue_admin_ok", "1");
+    await openLiveDashboard();
   });
 
   document.querySelector("#demo-button")?.addEventListener("click", () => {
@@ -45,46 +52,34 @@
       showDashboard(aggregate([...demoResponses, ...readLocalResponses()]));
       return;
     }
-    if (activeKey) await openLiveDashboard(activeKey, true);
+    if (authorizedSession) await openLiveDashboard(true);
   });
 
   document.querySelector("#logout-button").addEventListener("click", () => {
-    activeKey = "";
+    authorizedSession = false;
     demoActive = false;
-    sessionStorage.removeItem("iceblue_admin_key");
+    sessionStorage.removeItem("iceblue_admin_ok");
     dashboard.hidden = true;
     loginCard.hidden = false;
     loginForm.reset();
   });
 
-  async function openLiveDashboard(key, silent = false) {
-    if (!key) {
-      loginError.textContent = "Saisissez votre code administrateur.";
-      return;
-    }
+  async function openLiveDashboard(silent = false) {
     const submit = loginForm.querySelector("button[type='submit']");
     if (!silent) {
       submit.disabled = true;
       submit.textContent = "Connexion…";
     }
     try {
-      const data = await fetchJsonpWithRetry(
-        config.appsScriptUrl,
-        { action: "stats", key },
-        (attempt, attempts) => {
-          if (!silent && attempt > 1) submit.textContent = `Nouvel essai ${attempt}/${attempts}…`;
-        }
-      );
-      if (!data?.ok) throw new Error(data?.error || "Accès refusé");
-      activeKey = key;
-      sessionStorage.setItem("iceblue_admin_key", key);
+      const data = await fetchPublicStatsWithRetry((attempt, attempts) => {
+        if (!silent && attempt > 1) submit.textContent = `Nouvel essai ${attempt}/${attempts}…`;
+      });
+      if (!data?.ok) throw new Error("Données indisponibles");
       showDashboard(data);
       document.querySelector("#mode-pill").textContent = "Données en direct";
       notice.hidden = true;
     } catch (error) {
-      loginError.textContent = error.message === "Accès refusé"
-        ? "Code incorrect."
-        : "Google met trop de temps à répondre. Patientez quelques secondes, puis réessayez.";
+      loginError.textContent = "Les statistiques sont momentanément indisponibles. Réessayez dans quelques secondes.";
       if (silent) {
         notice.hidden = false;
         notice.textContent = "Actualisation impossible. Les derniers résultats chargés restent affichés.";
@@ -95,14 +90,14 @@
     }
   }
 
-  async function fetchJsonpWithRetry(url, params, onAttempt) {
+  async function fetchPublicStatsWithRetry(onAttempt) {
     const attempts = 2;
     let lastError;
 
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       onAttempt?.(attempt, attempts);
       try {
-        return await fetchJsonp(url, { ...params, attempt });
+        return await fetchPublicStats(attempt);
       } catch (error) {
         lastError = error;
         if (attempt < attempts) {
@@ -114,12 +109,20 @@
     throw lastError || new Error("Connexion impossible");
   }
 
-  function fetchJsonp(url, params) {
+  function fetchPublicStats(attempt) {
     return new Promise((resolve, reject) => {
       const callbackName = `iceBlueCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
       const script = document.createElement("script");
       const timeout = window.setTimeout(() => cleanup(new Error("Délai dépassé")), 22000);
-      const query = new URLSearchParams({ ...params, callback: callbackName, _: Date.now().toString() });
+      const tqx = `out:json;responseHandler:${callbackName};reqId:${Date.now()}`;
+      const query = new URLSearchParams({
+        sheet: config.publicStatsSheetName || "Statistiques",
+        range: "A1",
+        headers: "0",
+        tqx,
+        attempt: String(attempt || 1),
+        _: Date.now().toString(),
+      });
 
       function cleanup(error, value) {
         window.clearTimeout(timeout);
@@ -128,11 +131,27 @@
         error ? reject(error) : resolve(value);
       }
 
-      window[callbackName] = (payload) => cleanup(null, payload);
+      window[callbackName] = (payload) => {
+        try {
+          if (!payload || payload.status !== "ok") throw new Error("Réponse Google invalide");
+          const raw = payload.table?.rows?.[0]?.c?.[0]?.v;
+          if (typeof raw !== "string") throw new Error("Statistiques absentes");
+          cleanup(null, JSON.parse(raw));
+        } catch (error) {
+          cleanup(error);
+        }
+      };
       script.onerror = () => cleanup(new Error("Connexion impossible"));
-      script.src = `${url}${url.includes("?") ? "&" : "?"}${query}`;
+      script.src = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(config.publicStatsSheetId)}/gviz/tq?${query}`;
       document.body.appendChild(script);
     });
+  }
+
+  async function verifyAdminKey(value) {
+    const bytes = new TextEncoder().encode(String(value || ""));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    const hash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+    return hash === config.adminKeyHash;
   }
 
   function showDashboard(data) {
@@ -306,6 +325,5 @@
     return Number.isNaN(date.valueOf()) ? "—" : new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(date);
   }
 
-  const savedKey = sessionStorage.getItem("iceblue_admin_key");
-  if (savedKey && isConfigured) openLiveDashboard(savedKey);
+  if (authorizedSession && isConfigured) openLiveDashboard();
 })();
