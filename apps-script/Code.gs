@@ -1,10 +1,14 @@
 /**
  * Ice Blue Lomé — collecteur Google Sheets + statistiques privées.
- * À coller dans Extensions > Apps Script depuis le Google Sheet de destination.
+ * À coller dans un projet Apps Script autonome.
  */
 
+const SPREADSHEET_ID = "13dNpXkgmcXn7F2U9wAiyLvlb5mZrk4EWK7eqeacr4Vo";
+const DEFAULT_ADMIN_KEY = "13be51440644419ca70d68853e52c3cc";
 const SHEET_NAME = "Réponses";
 const LIST_SEPARATOR = " || ";
+const PUBLIC_STATS_SPREADSHEET_ID = "1rUC7mGjuRAkoXV93Fn8RPboEVqbQbfs4h1beGFXhs3Q";
+const PUBLIC_STATS_SHEET_NAME = "Statistiques";
 const HEADERS = [
   "Horodatage",
   "Identifiant",
@@ -34,13 +38,13 @@ function installer() {
   sheet.autoResizeColumns(1, HEADERS.length);
 
   const properties = PropertiesService.getScriptProperties();
-  let adminKey = properties.getProperty("ADMIN_KEY");
-  if (!adminKey) {
-    adminKey = Utilities.getUuid().replace(/-/g, "");
-    properties.setProperty("ADMIN_KEY", adminKey);
-  }
+  let adminKey = properties.getProperty("ADMIN_KEY") || DEFAULT_ADMIN_KEY;
+  properties.setProperty("ADMIN_KEY", adminKey);
+
+  const publicStats = synchroniserStatistiquesPubliques();
 
   console.log("CODE ADMIN À CONSERVER : " + adminKey);
+  console.log("ID FEUILLE STATISTIQUES PUBLIQUES : " + publicStats.spreadsheetId);
   return "Installation terminée. Consultez le journal d’exécution pour copier le code admin.";
 }
 
@@ -88,6 +92,12 @@ function doPost(e) {
       lock.releaseLock();
     }
 
+    try {
+      syncPublicStats_();
+    } catch (syncError) {
+      console.error("Synchronisation des statistiques impossible", syncError);
+    }
+
     return jsonOutput_({ ok: true });
   } catch (error) {
     console.error(error);
@@ -97,18 +107,21 @@ function doPost(e) {
 
 function doGet(e) {
   const params = (e && e.parameter) || {};
+
+  if (params.action === "admin") {
+    return HtmlService.createTemplateFromFile("Admin")
+      .evaluate()
+      .setTitle("Tableau de bord | Ice Blue Lomé")
+      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+  }
+
   const callback = validCallback_(params.callback);
   let result;
 
   if (params.action === "health") {
-    result = { ok: true, service: "Ice Blue Lomé", configured: Boolean(PropertiesService.getScriptProperties().getProperty("ADMIN_KEY")) };
+    result = { ok: true, service: "Ice Blue Lomé", configured: true };
   } else if (params.action === "stats") {
-    const expected = PropertiesService.getScriptProperties().getProperty("ADMIN_KEY");
-    if (!expected || !secureEquals_(String(params.key || ""), expected)) {
-      result = { ok: false, error: "Accès refusé" };
-    } else {
-      result = buildStats_();
-    }
+    result = getAdminStats(params.key);
   } else {
     result = { ok: false, error: "Action inconnue" };
   }
@@ -116,9 +129,45 @@ function doGet(e) {
   return callback ? jsonpOutput_(callback, result) : jsonOutput_(result);
 }
 
+/** Appel interne de la page d’administration hébergée par Apps Script. */
+function getAdminStats(key) {
+  const expected = PropertiesService.getScriptProperties().getProperty("ADMIN_KEY") || DEFAULT_ADMIN_KEY;
+  if (!expected || !secureEquals_(String(key || ""), expected)) {
+    return { ok: false, error: "Accès refusé" };
+  }
+  return buildStats_();
+}
+
+/**
+ * Crée, publie et actualise un second classeur qui ne contient que les
+ * statistiques agrégées. Les réponses brutes et les prénoms restent privés.
+ */
+function synchroniserStatistiquesPubliques() {
+  const result = syncPublicStats_();
+  console.log("ID FEUILLE STATISTIQUES PUBLIQUES : " + result.spreadsheetId);
+  console.log("URL FEUILLE STATISTIQUES PUBLIQUES : " + result.url);
+  return result;
+}
+
+function syncPublicStats_() {
+  const spreadsheet = SpreadsheetApp.openById(PUBLIC_STATS_SPREADSHEET_ID);
+
+  let sheet = spreadsheet.getSheetByName(PUBLIC_STATS_SHEET_NAME);
+  if (!sheet) {
+    sheet = spreadsheet.getSheets()[0];
+    sheet.setName(PUBLIC_STATS_SHEET_NAME);
+  }
+
+  sheet.getRange("A1").setValue(JSON.stringify(buildStats_()));
+  sheet.setHiddenGridlines(true);
+  sheet.setColumnWidth(1, 120);
+  SpreadsheetApp.flush();
+
+  return { spreadsheetId: PUBLIC_STATS_SPREADSHEET_ID, url: spreadsheet.getUrl() };
+}
+
 function getSheet_() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  if (!spreadsheet) throw new Error("Ce script doit être créé depuis un Google Sheet.");
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) sheet.appendRow(HEADERS);
